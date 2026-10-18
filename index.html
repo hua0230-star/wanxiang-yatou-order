@@ -439,10 +439,11 @@ $('#form').onsubmit=async e=>{
   cart={};$('#note').value='';$('#time').value='';refresh();openSheet(true);
 };
 // 與客人 LINE 訂單相同格式：品名*數量 / 辣度 / HH:MM取，再附上聯絡資訊
+function maskPh(p){p=String(p||'').replace(/\D/g,'');return p?'末三碼 '+p.slice(-3):''}
 function lineText(o){
   const L=[...o.items.map(i=>`${i.name}*${i.qty}`),o.spice,`${o.pickup}取`];
   const extra=[];
-  if(o.name||o.phone)extra.push(`${o.name||''} ${o.phone||''}`.trim());
+  if(o.name||o.phone)extra.push(`${o.name||''} ${maskPh(o.phone)}`.trim());
   if(o.pay)extra.push(`付款：${o.pay}`);
   if(o.note)extra.push(`備註：${o.note}`);
   return L.join('\n')+(extra.length?'\n\n'+extra.join('\n'):'');
@@ -536,7 +537,7 @@ function renderAdmin(){
   $('#orders').innerHTML=list.length?list.map(o=>`
    <div class="card order ${o.status}">
     <div class="o-top"><span class="no">#${o.no} <span class="st ${o.status}">${ST[o.status]}</span>${o.source==='line'?'<span class="src">LINE</span>':''}</span><span class="amt">$${money(o.total)}</span></div>
-    <div class="o-meta">⏰ 取餐 <b style="color:var(--ink)">${o.pickup}</b>　🌶️ <b style="color:var(--red)">${esc(o.spice)}</b>　💰 <b style="color:var(--teal-d)">${esc(o.pay)}</b><br>👤 ${esc(o.name)}${o.phone?`　📞 <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>`:''}　🕒 下單 ${o.created.slice(11)}</div>
+    <div class="o-meta">⏰ 取餐 <b style="color:var(--ink)">${o.pickup}</b>　🌶️ <b style="color:var(--red)">${esc(o.spice)}</b>　💰 <b style="color:var(--teal-d)">${esc(o.pay)}</b><br>👤 ${esc(o.name)}${o.phone?`　📞 <a href="tel:${esc(o.phone)}">${esc(maskPh(o.phone))}</a>`:''}　🕒 下單 ${o.created.slice(11)}</div>
     <div class="o-items">${o.items.map(i=>`${esc(i.name)}×${i.qty}`).join('、')}</div>
     ${o.note?`<div class="o-note">📝 ${esc(o.note)}</div>`:''}
     <div class="o-act">
